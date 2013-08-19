@@ -1,0 +1,81 @@
+/* this is test */
+
+.wrapper
+  pass
+
+.header
+  pass
+.content
+  pass
+.footer
+  pass
+
+.main
+  pass
+  _header
+    pass
+  _content
+    pass
+  _footer
+    pass
+
+.page
+  pass
+  _header
+    pass
+  _content
+    pass
+  _footer
+    pass
+
+.main_page
+  pass
+  _header
+    pass
+  _content
+    pass
+  _footer
+    pass
+
+.detail_page
+  pass
+  _header
+    pass
+  _content
+    pass
+  _footer
+    pass
+
+.list_page
+  pass
+  _header
+    pass
+  _content
+    pass
+  _footer
+    pass
+
+.article
+  pass
+  _header
+    pass
+  _content
+    pass
+  _footer
+    pass
+
+.foo
+  -item
+    display none
+  -item-content
+    color #ddd
+    _selected
+      font-size bold
+
+.small_foo
+  -item
+    color #000
+  -item-content
+    font-size normal
+    _selected
+      font-size bold
