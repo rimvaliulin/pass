@@ -176,5 +176,5 @@ See ``LICENSE`` file.
 
 
 :Author: Rim Valiulin
-:Version: 0.9.beta.0 of 2013/06/02
+:Version: 1.0.0 of 2013/07/21
 :Dedication: To my wife.

@@ -2,11 +2,11 @@
 
 
 def main():
-    from Pass import Pass
+    from Pass import Pass, get_version
     import optparse
 
     p = optparse.OptionParser(prog='pass',
-                              version=Pass.get_version(),
+                              version=get_version(),
                               usage='usage: %prog [options] filename',
                               description='Compiles .pass files to .css')
 

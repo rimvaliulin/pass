@@ -37,3 +37,6 @@ nosetests.xml
 .idea
 .Sync*
 .DS_store
+MANIFEST
+build
+dist

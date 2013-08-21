@@ -4,10 +4,10 @@ from distutils.core import setup
 
 version = __import__('Pass').get_version()
 
-long_description = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
+long_description = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst'), 'rb', 'utf-8').read()
 
 setup(
-    name='Pass',
+    name=b'Pass',
     version=version,
     author='Rim Valiulin',
     author_email='rim.valiulin@gmail.com',
@@ -20,7 +20,7 @@ setup(
         'pass inheritance,pass,nested css,parser,preprocessor,bootstrap css,bootstrap pass,'
         'style,styles,stylesheet,variables in css,css pass'),
     packages=['Pass'],
-    scripts=['django/bin/pass'],
+    scripts=['bin/pass'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -32,4 +32,3 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
     ],
 )
-
