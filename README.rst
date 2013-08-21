@@ -102,41 +102,110 @@ Class naming scheme::
 |::                                        |::                                        |
 |                                          |                                          |
 |    // Pass                               |    /* Compiled CSS */                    |
-|    ._wrapper                             |    ._wrapper                             |
-|      pass                                |      pass                                |
-|                                          |                                          |
-|    .wrapper                              |    .wrapper                              |
-|      pass                                |      pass                                |
-|                                          |                                          |
-|    .header                               |    .header                               |
-|      pass                                |      pass                                |
-|    .content                              |    .content                              |
-|      pass                                |      pass                                |
-|    .footer                               |    .footer                               |
-|      pass                                |      pass                                |
-|                                          |                                          |
-|    .main                                 |    .main                                 |
-|      pass                                |      pass                                |
-|      _header                             |      _header                             |
-|        pass                              |        pass                              |
-|      _content                            |      _content                            |
-|        pass                              |        pass                              |
-|      _footer                             |      _footer                             |
-|        pass                              |        pass                              |
-|                                          |                                          |
-|    .page                                 |    .page                                 |
-|      pass                                |      pass                                |
-|      _header                             |      _header                             |
-|        pass                              |        pass                              |
-|      _content                            |      _content                            |
-|        pass                              |        pass                              |
-|      _footer                             |      _footer                             |
-|        pass                              |        pass                              |
-|                                          |                                          |
+|    ._foo                                 |    ._foo,.foo,.сhild_foo,.new_child_foo{}|
+|      pass                                |    .foo{}                                |
+|                                          |    .child_foo,.new_child_foo{}           |
+|    .foo                                  |    .new_child_foo{}                      |
+|      pass                                |    .footer{}                             |
+|                                          |    .main{}                               |
+|    .сhild_foo                            |    .main_header{}                        |
+|      pass                                |    .main_conten{}                        |
+|                                          |    .page_footer{}                        |
+|    .new_child_foo                        |                                          |
+|      pass                                |    .bar-link,bar-link_active{}           |
+|                                          |    bar-link_active{}                     |
+|    .bar                                  |                                          |
+|      -link                               |                                          |
+|        pass                              |                                          |
+|        _acive                            |                                          |
+|          pass                            |                                          |
 +------------------------------------------+------------------------------------------+
+
+
+Parent directive
+--------------------
+Usage::
+
+    @parent "style.pass"
+
 
 Functions
 ---------
+
+Color initialization
+####################
+
+rgb(r, g, b) - Converts an Rgb(r, g, b) triplet into a color
+
+rgba(r, g, b, a) - Converts an Rgba(r, g, b, a) quadruplet into a color.
+
+hsl(h, s, l) - Converts an Hsl(h, s, l) triplet into a color.
+
+hsla(h, s, l, a) - Converts an Hsla(h, s, l) quadruplet into a color.
+
+
+Get/set color components
+########################
+
+red(color, value=None) - Return the red component of the given color.
+
+green(color, value=None) - Return the green component of the given color.
+
+blue(color, value=None) - Return the blue component of the given color.
+
+hue(color, value=None) - Return the hue of the given color.
+
+saturation(color, value=None) - Return the saturation of the given color.
+
+lightness(color, value=None) - Return the lightness of the given color.
+
+alpha(color, value=None) - Return the alpha component of the given color.
+
+Color adjustment
+################
+
+spinin(color, value=Pr(10)) - Changes the hue of a color.
+
+spinout(color, value=Pr(10)) - Changes the hue of a color.
+
+lighten(color, value=Pr(10)) - Makes a color lighten.
+
+darken(color, value=Pr(10)) - Makes a color darker.
+
+saturate(color, value=Pr(10)) - Makes a color more saturated.
+
+esaturate(color, value=Pr(10)) - Makes a color less saturated.
+
+fadein(color, value=Pr(10)) - Add or change an alpha layer for any color value.
+
+fadeout(color, value=Pr(10)) - Add or change an alpha layer for any color value.
+
+grayscale(color) - Converts a color to grayscale.
+
+complement(color) - Returns the complement of a color.
+
+invert(color) - Returns the inverse of a color.
+
+mix(color, color1, weight=Pr(50)) - Mixes two colors together.
+
+String Functions
+################
+
+quote(s) - Removes the quotes from a string.
+
+unquote(s) - Adds quotes to a string.
+
+Number Functions
+################
+
+percentage(value) - Converts a unitless number to a percentage.
+
+round_(value, digits=0) - Rounds a number to the nearest whole number.
+
+ceil(value) - Rounds a number up to the nearest whole number.
+
+floor(value) - Rounds a number down to the nearest whole number.
+
 
 Command-line options
 --------------------
