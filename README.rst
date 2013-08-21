@@ -1,7 +1,7 @@
 ====
 Pass
 ====
-http://githab.com/neet3d/pass
+http://githab.com/rimvaliulin/pass
 
 The **pythonic awesome** stylesheet language.
 
