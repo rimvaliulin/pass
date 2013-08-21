@@ -2,7 +2,7 @@ import os
 import sys
 from base import read_from_file, read_from_string, write_to_file, write_to_stdout, process_pass
 
-__version__ = (0, 9, 0)
+__version__ = (1, 0, 0)
 
 
 class Pass(object):
@@ -20,10 +20,6 @@ class Pass(object):
             except IndexError:
                 print e.args
 
-    @staticmethod
-    def get_version():
-        return '.'.join(map(str, __version__))
-
     def print_error(self, e, filename, n, msg):
         name = e.__class__.__name__
         with open(filename) as f:
@@ -36,3 +32,7 @@ class Pass(object):
             tab = lines[m][:len(lines[m]) - len(lines[m].lstrip())]
             lines = ''.join(lines[:m] + [tab + '^\n'] + lines[m:])
             sys.stderr.write('File "%s", line %s\n%s%s: %s\n' % (os.path.normpath(filename), n, lines, name, msg))
+
+
+def get_version():
+    return '.'.join(map(str, __version__))
