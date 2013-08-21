@@ -106,11 +106,11 @@ Class naming scheme::
 |      pass                                |    .foo{}                                |
 |                                          |    .child_foo,.new_child_foo{}           |
 |    .foo                                  |    .new_child_foo{}                      |
-|      pass                                |    .footer{}                             |
-|                                          |    .main{}                               |
-|    .сhild_foo                            |    .main_header{}                        |
-|      pass                                |    .main_conten{}                        |
-|                                          |    .page_footer{}                        |
+|      pass                                |                                          |
+|                                          |                                          |
+|    .сhild_foo                            |                                          |
+|      pass                                |                                          |
+|                                          |                                          |
 |    .new_child_foo                        |                                          |
 |      pass                                |    .bar-link,bar-link_active{}           |
 |                                          |    bar-link_active{}                     |
@@ -245,5 +245,5 @@ See ``LICENSE`` file.
 
 
 :Author: Rim Valiulin
-:Version: 1.0.0 of 2013/07/21
+:Version: 1.0.4 of 2013/07/21
 :Dedication: To my wife.
