@@ -102,6 +102,9 @@ Class naming scheme::
 |::                                        |::                                        |
 |                                          |                                          |
 |    // Pass                               |    /* Compiled CSS */                    |
+|    ._wrapper                             |    ._wrapper                             |
+|      pass                                |      pass                                |
+|                                          |                                          |
 |    .wrapper                              |    .wrapper                              |
 |      pass                                |      pass                                |
 |                                          |                                          |
