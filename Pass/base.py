@@ -37,7 +37,6 @@ def null():
         if data is not None:
             yield
             pass
-            #print data
 
 
 def read_from_file(filename):
@@ -390,7 +389,9 @@ def combine_selectors(lines):
     first = True
     stack = []
     selectors = [[]]
-    for f, n, name, level, behind, sel, _sel in lines:
+    _level, _sel = -1, True
+    for f, n, name, level, _, sel, _ in lines:
+        behind = level - _level
         if sel and (_sel and behind > 0 or not _sel and behind == 0):
             stack.append(selectors)
             selectors = [s + [name] for s in selectors]
@@ -407,6 +408,7 @@ def combine_selectors(lines):
                     sel_ = True
                 first = False
             yield name, sel, _sel
+        _level, _sel = level, sel
 
 
 def make_statements_list(lines):
