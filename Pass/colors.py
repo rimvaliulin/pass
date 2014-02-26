@@ -71,7 +71,7 @@ class ColorComponent(object):
     def __ge__(self, other):
         return self._value >= self.convert(other)
 
-    def __ge__(self, other):
+    def __le__(self, other):
         return self._value <= self.convert(other)
 
 
