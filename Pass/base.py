@@ -599,7 +599,7 @@ def process_pass(filename, compressed=True, empty_selectors=True, respect_indent
     importer = import_pass_file(reader)
     # f, n, line
     lines = first_line_update_by_parent(importer, target, compressed, empty_selectors, respect_indents,
-                 inherit_selectors, indent, css_indent, newlines)
+                                        inherit_selectors, indent, css_indent, newlines)
     lines = ignore_empty_lines(lines, target)
     lines = ignore_line_comments(lines, target)
     lines = ignore_block_comments(lines, target)
