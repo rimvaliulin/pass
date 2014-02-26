@@ -2,7 +2,7 @@ import os
 import sys
 from base import read_from_file, read_from_string, write_to_file, write_to_stdout, process_pass
 
-__version__ = (1, 0, 4)
+__version__ = (1, 0, 5)
 
 
 class Pass(object):
