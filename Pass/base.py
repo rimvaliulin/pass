@@ -612,9 +612,9 @@ def process_pass(filename, compressed=True, empty_selectors=True, respect_indent
     lines = check_media_queries_syntax(lines)
     #lines = filter_properties(lines)
     lines = evaluate_properties(lines)
-
-    # с этого момента структура файла изменилась
-
+    ######################
+    # Structural changes #
+    ######################
     lines = combine_selectors(lines)
     # name, sel, _sel
     lines = make_statements_list(lines)
