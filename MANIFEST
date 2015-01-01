@@ -6,6 +6,7 @@ Pass/base.py
 Pass/colors.py
 Pass/cssmin.py
 Pass/functions.py
+Pass/properties.py
 Pass/units.py
 Pass/utils.py
 bin/pass

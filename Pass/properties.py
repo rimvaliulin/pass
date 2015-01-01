@@ -1,6 +1,5 @@
 """
 Full CSS2 property table
-This appendix is informative, not normative.
 http://www.w3.org/TR/CSS2/propidx.html
 """
 properties = (
