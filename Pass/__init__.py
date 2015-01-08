@@ -1,3 +1,5 @@
+# encoding: utf-8
+from __future__ import unicode_literals
 import os
 import sys
 from base import read_from_file, read_from_string, write_to_file, write_to_stdout, process_pass
@@ -13,14 +15,14 @@ class Pass(object):
             process_pass(filename, compressed, empty_selectors, respect_indents,
                          inherit_selectors, indent, css_indent, newlines)
         except (SyntaxError, IndentationError) as e:
-            self.print_error(e, e.filename, e.lineno, getattr(e, 'msg', e.message))
+            self._print_error(e, e.filename, e.lineno, getattr(e, 'msg', e.message))
         except (ValueError, IOError) as e:
             try:
-                self.print_error(e, e.args[1][0], e.args[1][1], e.args[0])
+                self._print_error(e, e.args[1][0], e.args[1][1], e.args[0])
             except IndexError:
                 print e.args
 
-    def print_error(self, e, filename, n, msg):
+    def _print_error(self, e, filename, n, msg):
         name = e.__class__.__name__
         with open(filename) as f:
             margin = 1
