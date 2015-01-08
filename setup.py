@@ -15,7 +15,6 @@ setup(
     download_url='https://github.com/rimvaliulin/pass',
     license='BSD',
     description='The pythonic awesome stylesheet language',
-    long_description=long_description,
     keywords=('css,css3,process pass,css nesting,css variable,css,gradients css,gradients css3,pass compiler,pass css,'
         'pass inheritance,pass,nested css,parser,preprocessor,bootstrap css,bootstrap pass,'
         'style,styles,stylesheet,variables in css,css pass'),
