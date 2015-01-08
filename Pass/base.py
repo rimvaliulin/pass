@@ -50,11 +50,12 @@ def read_from_string(string):
         yield None, n, line.rstrip()
 
 
-def write_to_file(lines, filename, newlines=True):
+def write_to_file(lines, filename, newlines=True, compressed=True):
     filename, ext = os.path.splitext(filename)
+    end_of_line = ('\n' if newlines else '' if compressed else '\n')
     with codecs.open(filename + '.css', 'wb+', 'utf-8') as f:
         for line in lines:
-            f.write(line + '\n' if newlines else '')
+            f.write(line + end_of_line)
 
 
 def write_to_stdout(lines):
@@ -440,7 +441,7 @@ def split_selectors(lines):
         yield _selectors, declarations
 
 
-def inherit_statements(lines, respect_indents=True, inherit_selectors=True):
+def inherit_statements(lines, respect_indents=True, inherit_selectors=False):
     """
     # Class naming scheme:
     > block - element
@@ -454,8 +455,6 @@ def inherit_statements(lines, respect_indents=True, inherit_selectors=True):
         parent_selectors = []
         for selector in selectors:
             selector_hash = indent_sep.join(selector)
-            if selector_hash[:1] not in ('.', '#'):
-                break
             block, _, element = selector_hash.partition('-')
             child_block = block
             child_element = element
@@ -470,7 +469,7 @@ def inherit_statements(lines, respect_indents=True, inherit_selectors=True):
                     break
             while '_' in child_block:
                 child_block, _, parent_block = child_block.partition('_')
-                prefix = child_block[:1]
+                prefix = child_block[0]
                 parent_block = prefix + parent_block if prefix in ('.', '#') else parent_block
                 block_selector = parent_block + '-' + element if element else parent_block
                 block_selector = block_selector.lstrip(indent_sep)
@@ -478,11 +477,6 @@ def inherit_statements(lines, respect_indents=True, inherit_selectors=True):
                 child_block = parent_block
                 if not inherit_selectors:
                     break
-            # foo base class makes _foo
-            if len(parent_selectors) > 0 and '-' not in parent_selectors[-1]:
-                parent_selectors[-1] = parent_selectors[-1][:1] + '_' + parent_selectors[-1][1:]
-            elif not parent_selectors:
-                parent_selectors.append(child_block[:1] + '_' + child_block[1:])
             for parent_selector_hash in parent_selectors:
                 if not respect_indents:
                     parent_selector_hash = parent_selector_hash.replace(indent_sep, '')
@@ -626,4 +620,4 @@ def process_pass(filename, compressed=True, empty_selectors=True, respect_indent
     lines = add_vendor_prefixes_to_properties(lines)
     lines = add_clearfix(lines)
     lines = make_css_from_statements(lines, compressed, empty_selectors, css_indent, target)
-    write_to_file(lines, filename, newlines)
+    write_to_file(lines, filename, newlines, compressed)
