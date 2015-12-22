@@ -371,7 +371,7 @@ def evaluate_properties(lines):
                     raise SyntaxError(e.msg, (f, n, None, name))
                 except (NameError, AttributeError, ValueError) as e:
                     raise SyntaxError(e, (f, n, None, name))
-            elif prop in ('margin', 'padding', 'border') or prop.startswith('border-'):
+            elif prop in ('margin', 'padding', 'border', 'flex') or prop.startswith('border-'):
                 expr = color_pattern(expr)
                 expr = unit_pattern(expr)
                 for i in range(4):
