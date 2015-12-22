@@ -210,20 +210,22 @@ floor(value) - Rounds a number down to the nearest whole number.
 Command-line options
 --------------------
 
---version                              show program's version number and exit
--h, --help                             show this help message and exit
--i, --inherit                          use selector inheritance, rather then property duplication
--c, --compressed                       compress imported .css files
--e, --empty-selectors                  keep empty selectors
--r, --respect-indents                  respect indentes
--n, --newlines                         use newlines
--I INDENT, --indent=INDENT             .pass file indentation. default 2 breaks
--C CSS_INDENT, --css-indent=CSS_INDENT .css file indentation. default 4 breaks
+--version                               show program's version number and exit
+-h, --help                              show this help message and exit
+-i, --inherit                           use selector inheritance, rather then property duplication
+-c, --compressed                        compress imported .css files
+-e, --empty-selectors                   keep empty selectors
+-r, --respect-indents                   respect indentes
+-n, --newlines                          use newlines
+-I INDENT, --indent=INDENT              .pass file indentation. default 2 breaks
+-C CSS_INDENT, --css-indent=CSS_INDENT  .css file indentation. default 4 breaks
+-C CSS_INDENT, --css-indent=CSS_INDENT  .css file indentation. default 4 breaks
 
 License
 =======
 
 See ``LICENSE`` file.
+
 ::
 
 > Copyright (c) 2012 Rim Valiulin
