@@ -58,7 +58,7 @@ class Unit(object):
                 raise TypeError("Undefined type")
         except AttributeError:
             if self.type == '%':
-                if not 0 <= value <= 100:
+                if not -100 <= value <= 100:
                     raise ValueError('percent type must be in 0..100')
             return value
 
