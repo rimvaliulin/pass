@@ -1,7 +1,7 @@
 ====
 Pass
 ====
-http://githab.com/rimvaliulin/pass
+http://github.com/rimvaliulin/pass
 
 The **pythonic awesome** stylesheet language.
 
@@ -230,5 +230,3 @@ See ``LICENSE`` file.
 
 
 :Author: Rim Valiulin
-:Version: 1.0.4 of 2013/07/21
-:Dedication: To my wife.
