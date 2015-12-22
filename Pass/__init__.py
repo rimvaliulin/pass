@@ -24,17 +24,21 @@ class Pass(object):
 
     def _print_error(self, e, filename, n, msg):
         name = e.__class__.__name__
-        with open(filename) as f:
-            margin = 1
-            lines = []
-            for i, line in enumerate(f):
-                if n - margin <= i + 1 <= n + margin:
-                    lines.append(line)
-            m = len(lines)/2 + 1
-            tab = lines[m][:len(lines[m]) - len(lines[m].lstrip())]
-            lines = ''.join(lines[:m] + [tab + '^\n'] + lines[m:])
-            sys.stderr.write('File "%s", line %s\n%s%s: %s\n' % (os.path.normpath(filename), n, lines, name, msg))
-
+        try:
+            with open(filename) as f:
+                margin = 1
+                lines = []
+                for i, line in enumerate(f):
+                    if n - margin <= i + 1 <= n + margin:
+                        lines.append(line)
+                m = len(lines)/2 + 1
+                tab = lines[m][:len(lines[m]) - len(lines[m].lstrip())]
+                lines = ''.join(lines[:m] + [tab + '^\n'] + lines[m:])
+                sys.stderr.write('File "%s", line %s\n%s%s: %s\n' % (os.path.normpath(filename), n, lines, name, msg))
+                sys.exit(1)
+        except IOError:
+            sys.stderr.write('File "%s", line %s\n%s%s: %s\n' % (os.path.normpath(filename), n, None, name, msg))
+            sys.exit(1)
 
 def get_version():
     return '.'.join(map(str, __version__))
