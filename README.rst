@@ -1,5 +1,5 @@
 ====
-Pass
+PASS
 ====
 http://github.com/rimvaliulin/pass
 
@@ -7,7 +7,7 @@ The **pythonic awesome** stylesheet language.
 
 About
 =====
-Pass is a dynamic stylesheet language and css preprocessor for web-developers that makes ccs coding simple and
+PASS is a dynamic stylesheet language and css preprocessor for web-developers that makes ccs coding simple and
 beautiful by having dynamic behavior such as variables, inheritance, operations and functions with python like indented syntax.
 
 Installation
