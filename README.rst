@@ -1,7 +1,7 @@
 ====
 PASS
 ====
-http://github.com/rimvaliulin/pass
+http://github.com/rimvaliulin/PASS
 
 The **pythonic awesome** stylesheet language.
 
