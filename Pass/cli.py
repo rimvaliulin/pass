@@ -1,0 +1,51 @@
+# encoding: utf-8
+import argparse
+
+from Pass import get_version
+
+
+def main():
+    parser = argparse.ArgumentParser(prog='pass', usage='%(prog)s [options] filename',
+                                     description='Compiles .pass files to .css')
+
+    parser.add_argument('-V', '--version', action='version', version=get_version())
+
+    parser.add_argument('-i', '--inherit', action='store_true',
+                        help='use selector inheritance, rather then property duplication',
+                        dest='inherit_selectors')
+
+    parser.add_argument('-c', '--formatted', action='store_false',
+                        help='pretty format result .css file',
+                        dest='compressed')
+
+    parser.add_argument('-e', '--empty-selectors', action='store_true',
+                        help='keep empty selectors',
+                        dest='empty_selectors')
+
+    parser.add_argument('-r', '--respect-indents', action='store_true',
+                        help='respect indents',
+                        dest='respect_indents')
+
+    parser.add_argument('-n', '--newlines', action='store_true',
+                        help='use newlines',
+                        dest='newlines')
+
+    parser.add_argument('-I', '--indent', action='store', default='  ', type=str,
+                        help='.pass file indentation. default 2 breaks',
+                        dest='indent')
+
+    parser.add_argument('-C', '--css-indent', action='store', default='    ', type=str,
+                        help='.css file indentation. default 4 breaks',
+                        dest='css_indent')
+
+    parser.add_argument('filename', help='.pass filename')
+
+    args = parser.parse_args()
+    from Pass import Pass
+    Pass(args.filename, compressed=args.compressed, empty_selectors=args.empty_selectors,
+         respect_indents=args.respect_indents, inherit_selectors=args.inherit_selectors,
+         newlines=args.newlines, indent=args.indent, css_indent=args.css_indent)
+
+
+if __name__ == '__main__':
+    main()

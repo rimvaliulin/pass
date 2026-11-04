@@ -3,12 +3,12 @@ from __future__ import unicode_literals, division
 
 import re
 import functools
-from operator import mul, div, add, sub
+from operator import mul, truediv, add, sub
 
 relative = ['em', 'ex', '%']
 absolute = ['mm', 'cm', 'in', 'pt', 'pc', 'px']
 
-p = re.compile(r'([\d.]+)(' + '|'.join(relative + absolute) + ')')
+p = re.compile(r'([\d.]+)(' + '|'.join(relative + absolute) + ')', re.IGNORECASE)
 
 
 def unit_replace(match):
@@ -41,8 +41,9 @@ class Unit(object):
                     raise ValueError("conversion not supported in relative types")
                 return value.value
             elif self.type in absolute and value.type in absolute:
+                source = value.type
                 value = value.value
-                for _type, op in ((self.type, div), (value.type, mul)):
+                for _type, op in ((source, mul), (self.type, truediv)):
                     if _type == 'mm':
                         value = op(value, 720 / 254.)
                     elif _type == 'cm':
@@ -88,9 +89,6 @@ class Unit(object):
     def __int__(self):
         return int(self.value)
 
-    def __long__(self):
-        return long(self.value)
-
     def __float__(self):
         return float(self.value)
 
@@ -103,7 +101,7 @@ class Unit(object):
     def __mul__(self, other):
         return self.__class__(self.value*self.convert(other))
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         return self.__class__(self.value/self.convert(other))
 
     def __radd__(self, other):
@@ -115,7 +113,7 @@ class Unit(object):
     def __rmul__(self, other):
         return self.percent(other, lambda x, y: y)
 
-    def __rdiv__(self, other):
+    def __rtruediv__(self, other):
         return self.percent(other, lambda x, y: x - y)
 
     def __iadd__(self, other):
@@ -127,8 +125,8 @@ class Unit(object):
     def __imul__(self, other):
         return self.__mul__(other)
 
-    def __idiv__(self, other):
-        return self.__div__(other)
+    def __itruediv__(self, other):
+        return self.__truediv__(other)
 
     def __neg__(self):
         return self.__class__(-self.value)
@@ -138,12 +136,6 @@ class Unit(object):
 
     def __abs__(self):
         return abs(self.value)
-
-    def __oct__(self):
-        return oct(self.value)
-
-    def __hex__(self):
-        return hex(self.value)[2:]
 
     def __str__(self):
         value = str(self.value)
@@ -210,4 +202,4 @@ def unitdispatcher(func):
 
 
 if __name__ == "__main__":
-    print Px(980) - Px(630)
+    print(Px(980) - Px(630))

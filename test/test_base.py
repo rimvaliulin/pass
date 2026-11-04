@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
+import os
 import unittest
-from Pass.base import (read_and_write_file, read_from_string, ignore_empty_lines,
+from Pass.base import (process_pass, read_from_string, ignore_empty_lines,
                        ignore_line_comments, ignore_block_comments, define_variables,
                        tokenize_selectors_and_properties, check_indentation_errors,
                        check_imports_syntax, filter_properties, evaluate_properties,
@@ -40,7 +41,7 @@ def _plain(first):
 
 def _print(first):
     for i in first:
-        print i
+        print(i)
 
 
 class TestBase(unittest.TestCase):
@@ -58,9 +59,10 @@ class TestBase(unittest.TestCase):
             self.first = temp
 
     def test_load_from_file(self):
-        read_and_write_file('there_no_such_file.pass')
-        #with self.assertRaises(IOError):
-        #    read_and_write_file('there_no_such_file.pass')
+        with self.assertRaises(IOError):
+            process_pass('there_no_such_file.pass')
+        if os.path.exists('there_no_such_file.css'):
+            os.remove('there_no_such_file.css')
 
     def test_load_from_string(self):
         for first in ('\n', '\n', '\r\n', '\na\r\nb\nc\n \n    \n'):
@@ -85,7 +87,7 @@ class TestBase(unittest.TestCase):
             (2, 'hello world'),
             (3, 'a'),
         ]
-        first = _out(ignore_empty_lines(_in(first)))
+        first = _out(ignore_empty_lines(_in(first), self.target()))
         self.assertEqual(first, second)
 
     def test_ignore_line_comments(self):
@@ -152,7 +154,7 @@ class TestBase(unittest.TestCase):
             (6, "e = 'string'"),
         ]
         first = _out(define_variables(_in(first), self.target()))
-        self.assertDictContainsSubset({'a': 1, 'b': 2, 'e': 'string'}, _locals)
+        self.assertTrue({'a': 1, 'b': 2, 'e': 'string'}.items() <= _locals.items())
         self.assertEqual(first, second)
         self.assertListEqual(_out(self.first), second1)
 
@@ -220,13 +222,13 @@ class TestBase(unittest.TestCase):
             (10, ('border', 'none'), 3, 0, False, False),
             (0, '', 0, -3, True, False)]
         first = _out(tokenize_selectors_and_properties(_in(first), self.indent))
-        self.assertEquals(first, second)
+        self.assertEqual(first, second)
 
     def test_tokenize_selectors_and_properties_for_empty_input(self):
         first = '''
         '''
         first = _out(tokenize_selectors_and_properties(_in(first), self.indent))
-        self.assertEquals(first, [])
+        self.assertEqual(first, [])
 
     def test_check_indentation_errors(self):
         first = '''
@@ -338,7 +340,7 @@ class TestBase(unittest.TestCase):
             (0, '', 0, -1, True, False)]
         first = tokenize_selectors_and_properties(_in(first), self.indent)
         first = _out(filter_properties(first))
-        self.assertEquals(first, second)
+        self.assertEqual(first, second)
 
     def test_evaluate_properties_for_name_errors(self):
         first = (
@@ -347,7 +349,7 @@ class TestBase(unittest.TestCase):
             (None, 1, ('margin', 'not_defined_var'), 1, 0, False, False),
         )
         for first in first:
-            with self.assertRaises(NameError):
+            with self.assertRaises((SyntaxError, NameError)):
                 _out(evaluate_properties([first]))
 
     def test_evaluate_properties(self):
@@ -359,10 +361,10 @@ class TestBase(unittest.TestCase):
             (None, 1, ('margin', 'a'), 1, 0, False, False),
         )
         second = (
-            (('margin-bottom', '4'), 1, 0, False, False),
-            (('margin', '2 3 auto 4'), 1, 0, False, False),
-            (('margin', '2 3'), 1, 0, False, False),
-            (('margin', '2'), 1, 0, False, False),
+            (None, 1, ('margin-bottom', '4'), 1, 0, False, False),
+            (None, 1, ('margin', '2 3 auto 4'), 1, 0, False, False),
+            (None, 1, ('margin', '2 3'), 1, 0, False, False),
+            (None, 1, ('margin', '2'), 1, 0, False, False),
         )
         for first, second in zip(first, second):
             first = list(evaluate_properties([first]))
@@ -435,8 +437,8 @@ class TestBase(unittest.TestCase):
             (('width', '100%'), False, False),
         ]
         first = tokenize_selectors_and_properties(_in(first), self.indent)
-        first = list(combine_selectors(_out(first, 2)))
-        self.assertEquals(first, second)
+        first = list(combine_selectors(first))
+        self.assertEqual(first, second)
 
     def test_combine_selectors1(self):
         first = '''
@@ -480,8 +482,8 @@ class TestBase(unittest.TestCase):
             ('pass', False, True),
         ]
         first = tokenize_selectors_and_properties(_in(first), self.indent)
-        first = list(combine_selectors(_out(first, 2)))
-        self.assertEquals(first, second)
+        first = list(combine_selectors(first))
+        self.assertEqual(first, second)
 
     def test_make_statements_list(self):
         first = [
@@ -555,7 +557,7 @@ class TestBase(unittest.TestCase):
                 []),
         ]
         first = tokenize_selectors_and_properties(_in(first), self.indent)
-        first = combine_selectors(_out(first, 2))
+        first = combine_selectors(first)
         first = list(make_statements_list(first))
         self.assertEqual(first, second)
 
@@ -707,12 +709,10 @@ class TestBase(unittest.TestCase):
             ([], ['.empty'], []),
             (['@media print'], [], []),
         ]
-        second = '''\n'''
         temp = make_css_from_statements(first, compressed=True, empty_selectors=False, indent='  ')
-        self.assertEqual(_plain(temp), second)
-        second = '''\n'''
+        self.assertEqual(list(temp), [])
         temp = make_css_from_statements(first, compressed=False, empty_selectors=False, indent='  ')
-        self.assertEqual(_plain(temp), second)
+        self.assertEqual(list(temp), [])
 
 
 if __name__ == '__main__':

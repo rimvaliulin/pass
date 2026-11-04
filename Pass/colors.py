@@ -2,12 +2,12 @@
 from __future__ import unicode_literals, division
 
 import re
-from Pass.units import Pr
+from .units import Pr
 
 
 class ColorComponent(object):
 
-    __slots__ = ('max_value', '_value', 'value')
+    __slots__ = ('max_value', '_value')
 
     def __init__(self, value, max_value):
         self.max_value = max_value
@@ -88,8 +88,10 @@ class ColorDescriptor(object):
 
     __slots__ = ('name', 'max_value')
 
+    # assigned by the InitColorDescriptors metaclass
+    name: str
+
     def __init__(self, max_value):
-        self.name = None
         self.max_value = max_value
 
     def __set__(self, instance, value):
@@ -127,14 +129,13 @@ class HslDescriptor(ColorDescriptor):
         super(HslDescriptor, self).__set__(instance, value)
 
 
-class Color(object):
-    __metaclass__ = InitColorDescriptors
+class Color(object, metaclass=InitColorDescriptors):
 
     r, g, b = RgbDescriptor(255), RgbDescriptor(255), RgbDescriptor(255)
     h, s, l = HslDescriptor(360), HslDescriptor(1), HslDescriptor(1)
 
-    __slots__ = ('r', 'g', 'b', '_r', '_g', '_b', 'rgb_changed',
-                 'h', 's', 'l', '_h', '_s', '_l', 'hsl_changed', 'a')
+    __slots__ = ('_r', '_g', '_b', 'rgb_changed',
+                 '_h', '_s', '_l', 'hsl_changed', 'a')
 
     def __init__(self, *args):
         if len(args) == 1:
@@ -162,11 +163,13 @@ class Color(object):
 
     def from_rgb(self, r, g, b, a=None):
         self.r, self.g, self.b = r, g, b
+        self.hsl_changed = False
         if a is not None:
             self.a = a
 
     def from_hsl(self, h, s, l, a=None):
         self.h, self.s, self.l = h, s, l
+        self.rgb_changed = False
         if a is not None:
             self.a = a
 
@@ -180,12 +183,11 @@ class Color(object):
         else:
             d = _max - _min
             s = d/(2 - _max - _min) if l > 0.5 else d/(_max + _min)
-            h = None
             if r == _max:
                 h = (g - b)/d + (6 if g < b else 0)
             elif g == _max:
                 h = (b - r)/d + 2
-            elif b == _max:
+            else:
                 h = (r - g)/d + 4
             h /= 6
         self.rgb_changed = False
@@ -228,7 +230,7 @@ class Color(object):
         return self.to_hex()
 
     def to_hex(self):
-        r, g, b = self.r, self.g, self.b
+        r, g, b = int(self.r), int(self.g), int(self.b)
         if all(map(lambda x: (x >> 4) == (x - (x >> 4 << 4)), (r, g, b))):
             return '#%x%x%x' % (r >> 4, g >> 4, b >> 4)
         return '#%02x%02x%02x' % (r, g, b)
@@ -257,7 +259,7 @@ def color_pattern(string):
 if __name__ == '__main__':
     a = Color('ff9c00')
     #a.l = 0.4
-    print a.to_rgb()
-    print a
-    print '#%02x%02x%02x' % (123, 123, 0)
+    print(a.to_rgb())
+    print(a)
+    print('#%02x%02x%02x' % (123, 123, 0))
     #print a.__dict__

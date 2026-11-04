@@ -2,9 +2,12 @@
 from __future__ import unicode_literals
 import os
 import sys
-from base import read_from_file, read_from_string, write_to_file, write_to_stdout, process_pass
+from .base import read_from_file, read_from_string, write_to_file, write_to_stdout, process_pass
 
 __version__ = (1, 0, 5)
+
+__all__ = ['Pass', 'get_version', 'read_from_file', 'read_from_string',
+           'write_to_file', 'write_to_stdout', 'process_pass']
 
 
 class Pass(object):
@@ -15,12 +18,12 @@ class Pass(object):
             process_pass(filename, compressed, empty_selectors, respect_indents,
                          inherit_selectors, indent, css_indent, newlines)
         except (SyntaxError, IndentationError) as e:
-            self._print_error(e, e.filename, e.lineno, getattr(e, 'msg', e.message))
+            self._print_error(e, e.filename, e.lineno, getattr(e, 'msg', str(e)))
         except (ValueError, IOError) as e:
             try:
                 self._print_error(e, e.args[1][0], e.args[1][1], e.args[0])
             except IndexError:
-                print e.args
+                print(e.args)
 
     def _print_error(self, e, filename, n, msg):
         name = e.__class__.__name__
@@ -31,7 +34,7 @@ class Pass(object):
                 for i, line in enumerate(f):
                     if n - margin <= i + 1 <= n + margin:
                         lines.append(line)
-                m = len(lines)/2 + 1
+                m = len(lines)//2
                 tab = lines[m][:len(lines[m]) - len(lines[m].lstrip())]
                 lines = ''.join(lines[:m] + [tab + '^\n'] + lines[m:])
                 sys.stderr.write('File "%s", line %s\n%s%s: %s\n' % (os.path.normpath(filename), n, lines, name, msg))

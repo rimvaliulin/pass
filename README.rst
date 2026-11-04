@@ -12,8 +12,18 @@ beautiful by having dynamic behavior such as variables, inheritance, operations 
 
 Installation
 ------------
+Pass requires Python 3.9 or later (tested with Python 3.15). Python 2 is no longer supported.
 
-::
+The project is managed with `uv <https://docs.astral.sh/uv/>`_. To set up the environment and
+install the package in editable mode run::
+
+    uv sync
+
+After that use ``uv run`` to invoke commands inside the managed environment::
+
+    uv run pass style.pass
+
+Alternatively, install with pip::
 
     pip install pass
 
@@ -22,7 +32,7 @@ Command-line usage
 
 ::
 
-    pass style.pass
+    uv run pass style.pass
 
 Usage in Code
 -------------
@@ -210,16 +220,31 @@ floor(value) - Rounds a number down to the nearest whole number.
 Command-line options
 --------------------
 
---version                               show program's version number and exit
+-V, --version                           show program's version number and exit
 -h, --help                              show this help message and exit
 -i, --inherit                           use selector inheritance, rather then property duplication
--c, --compressed                        compress imported .css files
+-c, --formatted                         pretty format result .css file
 -e, --empty-selectors                   keep empty selectors
 -r, --respect-indents                   respect indentes
 -n, --newlines                          use newlines
 -I INDENT, --indent=INDENT              .pass file indentation. default 2 breaks
 -C CSS_INDENT, --css-indent=CSS_INDENT  .css file indentation. default 4 breaks
--C CSS_INDENT, --css-indent=CSS_INDENT  .css file indentation. default 4 breaks
+
+Running the tests
+-----------------
+
+From the project root run::
+
+    uv run python -m unittest discover -s test
+
+Static checks
+-------------
+
+The project uses `ruff <https://docs.astral.sh/ruff/>`_ for linting and `ty <https://docs.astral.sh/ty/>`_
+for type checking. Both are installed as dev dependencies by ``uv sync``::
+
+    uv run ruff check .
+    uv run ty check .
 
 License
 =======

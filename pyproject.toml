@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Pass"
+description = "The pythonic awesome stylesheet language"
+readme = "README.rst"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Rim Valiulin", email = "rim.valiulin@gmail.com"},
+]
+keywords = [
+    "css", "css3", "process pass", "css nesting", "css variable", "gradients css",
+    "gradients css3", "pass compiler", "pass css", "pass inheritance", "pass",
+    "nested css", "parser", "preprocessor", "bootstrap css", "bootstrap pass",
+    "style", "styles", "stylesheet", "variables in css", "css pass",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dynamic = ["version"]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://github.com/rimvaliulin/pass"
+Download = "https://github.com/rimvaliulin/pass"
+
+[project.scripts]
+pass = "Pass.cli:main"
+
+[tool.setuptools]
+packages = ["Pass"]
+
+[tool.setuptools.dynamic]
+version = {attr = "Pass.get_version"}
+
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+# E741: ambiguous variable name `l` — `l` is the lightness component
+# of HSL colors and part of the public API, e.g. hsl(h, s, l).
+ignore = ["E741"]
+
+[tool.ty.src]
+include = ["Pass", "test", "demo", "bin"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.3",
+    "ty>=0.0.96",
+]

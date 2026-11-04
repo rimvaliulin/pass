@@ -1,4 +1,4 @@
-from StringIO import StringIO
+from io import StringIO
 from token import NUMBER, NAME, OP, STRING
 from tokenize import generate_tokens, untokenize
 from Pass.utils import consumer
@@ -21,7 +21,7 @@ def decistmt(s):
     result = []
     g = generate_tokens(StringIO(s).readline)   # tokenize the string
     for toknum, tokval, _, _, _ in g:
-        print toknum, tokval
+        print(toknum, tokval)
         if toknum == NUMBER and '.' in tokval:  # replace NUMBER tokens
             result.extend([
                 (NAME, 'Decimal'),
@@ -43,7 +43,7 @@ def getter(lines):
     for line in lines:
         data = yield line
         if data is not None:
-            print '=>', data,
+            print('=>', data, end=' ')
             yield line
 
 
@@ -72,4 +72,4 @@ lines = iterator1(lines)
 lines = getter(lines)
 lines = iterator1(lines)
 for line in lines:
-    print line
+    print(line)

@@ -3,8 +3,8 @@ from __future__ import unicode_literals, division
 
 import math
 
-from Pass.colors import Color
-from Pass.units import Pr, unitdispatcher
+from .colors import Color
+from .units import Pr, unitdispatcher
 
 
 ########################
@@ -24,12 +24,16 @@ def rgba(r, g, b, a):
 
 def hsl(h, s, l):
     """Converts an Hsl(h, s, l) triplet into a color."""
-    return Color.from_hsl(h, s, l)
+    color = Color(0, 0, 0)
+    color.from_hsl(h, s, l)
+    return color
 
 
 def hsla(h, s, l, a):
     """Converts an Hsla(h, s, l) quadruplet into a color."""
-    return Color.from_hsl(h, s, l, a)
+    color = Color(0, 0, 0)
+    color.from_hsl(h, s, l, a)
+    return color
 
 
 ############################

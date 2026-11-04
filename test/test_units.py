@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 import unittest
-from Pass.units import Em, Ex, Pr, Mm, Cm, In, Pt, Pc, Px, unit_pattern
+from Pass.units import Em, Mm, Cm, In, Pt, Pc, Px, unit_pattern
 
 
 class TestUnits(unittest.TestCase):

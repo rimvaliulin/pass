@@ -4,19 +4,18 @@ from __future__ import unicode_literals, with_statement
 import os
 import re
 import sys
-import codecs
 from itertools import cycle, chain
 from copy import deepcopy
 
-from utils import last, consumer, vendor_prefixed_properties
-from units import Em, Pr, Pt, Cm, Mm, Px, Pc, Ex, In, unit_pattern
-from colors import color_pattern, Color
-from functions import round_, lighten, darken, desaturate, saturate
+from .utils import last, consumer, vendor_prefixed_properties
+from .units import Em, Pr, Pt, Cm, Mm, Px, Pc, Ex, In, unit_pattern
+from .colors import color_pattern, Color
+from .functions import round_, lighten, darken, desaturate, saturate
 
 IMPORT_TOKEN = 2
 MEDIA_TOKEN = 3
 
-_globals = {'__builtins__': None}
+_globals = {'__builtins__': {}}
 _reserved = {
     'auto': 'auto', 'none': 'none', 'solid': 'solid', 'dotted': 'dotted',
     'inherit': 'inherit',
@@ -40,7 +39,7 @@ def null():
 
 
 def read_from_file(filename):
-    with codecs.open(filename, 'rb+', 'utf-8') as f:
+    with open(filename, encoding='utf-8') as f:
         for n, line in enumerate(f, start=1):
             yield f.name, n, line.rstrip()
 
@@ -53,7 +52,7 @@ def read_from_string(string):
 def write_to_file(lines, filename, newlines=True, compressed=True):
     filename, ext = os.path.splitext(filename)
     end_of_line = ('\n' if newlines else '' if compressed else '\n')
-    with codecs.open(filename + '.css', 'wb+', 'utf-8') as f:
+    with open(filename + '.css', 'w', encoding='utf-8', newline='') as f:
         for line in lines:
             f.write(line + end_of_line)
 
@@ -68,7 +67,7 @@ def import_pass_file(lines):
     yield
     try:
         while True:
-            f, n, line = lines.next()
+            f, n, line = next(lines)
             data = yield f, n, line
             if data is not None:
                 yield f, n, line
@@ -187,9 +186,9 @@ def define_variables(lines, target):
                     raise SyntaxError('variable uses reserved word', (f, n, None, line))
                 exec_line = variable + ' = ' + color_pattern(unit_pattern(value))
                 try:
-                    exec exec_line in _globals, _locals
+                    exec(exec_line, _globals, _locals)
                 except (TypeError, SyntaxError, ValueError) as e:
-                    raise SyntaxError(e.message + ': %s' % exec_line, (f, n, None, line))
+                    raise SyntaxError(getattr(e, 'msg', str(e)) + ': %s' % exec_line, (f, n, None, line))
                 else:
                     target.send((f, n, line))
             else:
@@ -199,7 +198,7 @@ def define_variables(lines, target):
 
 
 def tokenize_selectors_and_properties(lines, indent='  '):
-    """
+    r"""
     http://www.w3.org/TR/2011/REC-CSS2-20110607/grammar.html
     property token:
     p = re.process(r'^-?(?:[_a-z]|[\240-\377]|\\[0-9a-f]{1,6}(?:\r\n|[ \t\r\n\f])?|\\[^\r\n\f0-9a-f])
@@ -214,7 +213,7 @@ def tokenize_selectors_and_properties(lines, indent='  '):
         if '\t' in line[:length]:
             _level -= 1
         line = line[length:]
-        level = length / indent_length + length % indent_length * indent_length
+        level = length // indent_length + length % indent_length * indent_length
         behind = level - _level
         if property_pattern.match(line):
             sel = False
@@ -286,6 +285,7 @@ def import_files(lines, target):
                 full_path = os.path.join(os.path.dirname(f), filename)
                 if not ext:
                     filename += '.pass'
+                    ext = '.pass'
                 if ext == '.pass':
                     if not os.path.exists(full_path):
                         raise IOError('file %s not exists' % filename, (f, n, None, None))
@@ -370,7 +370,7 @@ def evaluate_properties(lines):
                 except SyntaxError as e:
                     raise SyntaxError(e.msg, (f, n, None, name))
                 except (NameError, AttributeError, ValueError) as e:
-                    raise SyntaxError(e, (f, n, None, name))
+                    raise SyntaxError(str(e), (f, n, None, name))
             elif prop in ('margin', 'padding', 'border', 'flex') or prop.startswith('border-'):
                 expr = color_pattern(expr)
                 expr = unit_pattern(expr)
@@ -379,7 +379,7 @@ def evaluate_properties(lines):
                         expr = ' '.join([str(eval(v, _globals, _locals)) for v in expr.split(None, i)])
                     except (SyntaxError, NameError, ValueError) as e:
                         if i == 3:
-                            raise SyntaxError(getattr(e, 'msg', e.message), (f, n, None, name))
+                            raise SyntaxError(getattr(e, 'msg', str(e)), (f, n, None, name))
                     else:
                         break
             name = prop, expr
@@ -487,7 +487,7 @@ def inherit_statements(lines, respect_indents=True, inherit_selectors=False):
                                 statements[index[parent_selector_hash]][0].append(selector)
                     else:
                         if declarations:
-                            keys = zip(*declarations)[0]
+                            keys = list(zip(*declarations))[0]
                             temp = [i for i in index[parent_selector_hash] if i[0] not in keys]
                             declarations = temp + declarations
                         else:
@@ -552,20 +552,19 @@ def make_css_from_statements(lines, compressed=True, empty_selectors=True, inden
     if compressed:
         indent = ''
         try:
-            from cssmin import cssmin
+            from .cssmin import cssmin
         except ImportError:
             def cssmin(css, wrap=None):
                 pass
-    _media, _indent = [], ''
+    _media, _indent, _open_media = [], '', False
     for media, selectors, declarations in last(lines, ([], [], [])):
         if media != _media:
-            if _media:
-                target.send('}')
+            if _open_media:
+                if target is not None:
+                    target.send('}')
                 yield '}'
-                _indent = ''
-            if media:
-                yield (','.join(media) + '{') if compressed else (', '.join(media) + ' {')
-                _indent = indent
+                _open_media = False
+            _indent = ''
         if selectors == ['@import']:
             for _, path in declarations:
                 with open(path) as f:
@@ -573,6 +572,10 @@ def make_css_from_statements(lines, compressed=True, empty_selectors=True, inden
                     if content:
                         yield cssmin(content) if compressed else content
         elif empty_selectors or declarations:
+            if media and not _open_media:
+                yield (','.join(media) + '{') if compressed else (', '.join(media) + ' {')
+                _open_media = True
+                _indent = indent
             declarations = [_indent + indent + k + (':' if compressed else ': ') + str(v) + ';' for k, v in declarations]
             if selectors:
                 if compressed:
@@ -588,7 +591,6 @@ def make_css_from_statements(lines, compressed=True, empty_selectors=True, inden
 def process_pass(filename, compressed=True, empty_selectors=True, respect_indents=False,
                  inherit_selectors=False, indent='  ', css_indent='    ', newlines=True):
     target = null()
-    parents = []
     reader = read_from_file(filename)
     importer = import_pass_file(reader)
     # f, n, line

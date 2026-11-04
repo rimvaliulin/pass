@@ -6,21 +6,21 @@ import re
 def selector_pattern():
     nmstart = r'[_a-z]'
     nmchar = r'[_a-z0-9-]'
-    name = r'{nmchar}+'.format(nmchar=nmchar)
-    ident = r'-?{nmstart}{nmchar}*'.format(nmstart=nmstart, nmchar=nmchar)
+    name = nmchar + '+'
+    ident = r'-?' + nmstart + nmchar + '*'
     string1 = r'\"[^\n\r\f\\"]*\"'
     string2 = r"\'[^\n\r\f\\']*\'"
-    string = r'{string1}|{string2}'.format(string1=string1, string2=string2)
-    element_name = r'{ident}|\*'.format(ident=ident)
-    hash = r'#{name}'.format(name=name)
-    class_ = r'\.{ident}'.format(ident=ident)
-    attrib = r'\[\s*{ident}\s*(?:(?:=|~=|\|=)\s*(?:{ident}|{string})\s*)?\]'.format(ident=ident, string=string)
-    pseudo = r':(?:{ident}|{ident}\(\s*(?:{ident}\s*)?\))'.format(ident=ident)
+    string = string1 + '|' + string2
+    element_name = ident + r'|\*'
+    hash = '#' + name
+    class_ = r'\.' + ident
+    attrib = r'\[\s*' + ident + r'\s*(?:(?:=|~=|\|=)\s*(?:' + ident + '|' + string + r')\s*)?\]'
+    pseudo = r':(?:' + ident + r'|' + ident + r'\(\s*(?:' + ident + r'\s*)?\))'
     combinator = r'\+\s*|\>\s*'
-    simple_selector = r'{element_name}(?:{hash}|{class_}|{attrib}|{pseudo})*|(?:{hash}|{class}|{attrib}|{pseudo})+'.format(
-        element_name=element_name, hash=hash, class_=class_, attrib=attrib, pseudo=pseudo)
-    selector = r'{simple_selector}(?:{combinator}{selector}|\s+(?:{combinator}?{selector})?)?'.format(
-        simple_selector=simple_selector, combinator=combinator)
+    compound = r'(?:' + hash + '|' + class_ + '|' + attrib + '|' + pseudo + r')+'
+    simple_selector = element_name + r'(?:' + hash + '|' + class_ + '|' + attrib + '|' + pseudo + r')*|' + compound
+    selector = (simple_selector + r'(?:' + combinator + compound
+                + r'|\s+(?:' + combinator + '?' + compound + r')?)?')
     return re.compile(selector)
 
 
@@ -55,7 +55,7 @@ def consumer(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         gen = func(*args, **kwargs)
-        gen.next()
+        next(gen)
         return gen
     return wrapper
 
