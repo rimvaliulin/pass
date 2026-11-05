@@ -39,6 +39,10 @@ nosetests.xml
 # Virtual environments / uv
 .venv
 
+# Sphinx build output
+doc/_build
+doc/html
+
 .idea
 .Sync*
 .DS_store
