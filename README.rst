@@ -12,7 +12,7 @@ beautiful by having dynamic behavior such as variables, inheritance, operations 
 
 Installation
 ------------
-Pass requires Python 3.9 or later (tested with Python 3.15). Python 2 is no longer supported.
+Pass requires Python 3.10 or later (tested with Python 3.15). Python 2 is no longer supported.
 
 The project is managed with `uv <https://docs.astral.sh/uv/>`_. To set up the environment and
 install the package in editable mode run::
