@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pass — the pythonic awesome stylesheet language</title>
+<style>
+  :root {
+    --brand: #1f6ba2;
+    --brand-dark: #164e77;
+    --bg: #0f1720;
+    --panel: #16222e;
+    --text: #e8eef4;
+    --muted: #93a5b5;
+    --code-bg: #0b1218;
+    --accent: #7fd1b9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 72px 0 48px; }
+  h1 { font-size: 3rem; letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); }
+  .tagline { color: var(--muted); font-size: 1.25rem; margin: 12px 0 32px; }
+  .cta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 12px 24px; border-radius: 8px;
+    text-decoration: none; font-weight: 600; border: 1px solid var(--brand);
+  }
+  .btn.primary { background: var(--brand); color: #fff; }
+  .btn.primary:hover { background: var(--brand-dark); }
+  .btn.ghost { color: var(--text); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; padding: 32px 0; }
+  .card {
+    background: var(--panel); border: 1px solid #223242; border-radius: 12px; padding: 20px;
+  }
+  .card h3 { margin-bottom: 8px; font-size: 1.05rem; }
+  .card p { color: var(--muted); font-size: 0.95rem; }
+  pre {
+    background: var(--code-bg); border: 1px solid #223242; border-radius: 12px;
+    padding: 20px; overflow-x: auto; font-size: 0.9rem; line-height: 1.5;
+    margin: 24px 0 40px;
+  }
+  .c { color: #5c7080; } .k { color: #7fd1b9; } .v { color: #e5c07b; } .s { color: #98c1d9; }
+  footer { padding: 32px 0 64px; color: var(--muted); font-size: 0.9rem; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Pass<span>.</span></h1>
+    <p class="tagline">The pythonic awesome stylesheet language — a CSS preprocessor
+    with an indented, Python-like syntax.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://pass.readthedocs.io/">Read the Docs</a>
+      <a class="btn ghost" href="https://github.com/rimvaliulin/pass">GitHub</a>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <pre><code><span class="c">// variables, nesting and functions</span>
+brand = <span class="v">#1f6ba2</span>
+
+.menu
+  color brand
+  <span class="k">-item</span>
+    float left
+    padding <span class="v">16px</span> / 2
+  <span class="k">:hover</span>
+    color <span class="s">lighten(brand, Pr(10))</span></code></pre>
+  <div class="grid">
+    <div class="card">
+      <h3>Variables &amp; operations</h3>
+      <p>Define a value once, reuse it everywhere. Units are kept: <code>16px / 2</code> is <code>8px</code>.</p>
+    </div>
+    <div class="card">
+      <h3>Nested selectors</h3>
+      <p>Nest selectors instead of repeating long selector names, with <code>_child</code> and <code>-element</code> naming.</p>
+    </div>
+    <div class="card">
+      <h3>Color functions</h3>
+      <p><code>lighten()</code>, <code>darken()</code>, <code>mix()</code> and friends, with RGB↔HSL conversion built in.</p>
+    </div>
+    <div class="card">
+      <h3>@media, @import, @parent</h3>
+      <p>Media queries, file imports and a parent directive, all on the root level.</p>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="wrap">
+    Full documentation lives on <a href="https://pass.readthedocs.io/">Read the Docs</a>.
+    © 2012–2026 Rim Valiulin.
+  </div>
+</footer>
+</body>
+</html>
