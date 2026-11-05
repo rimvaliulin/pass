@@ -32,7 +32,11 @@ Alternatively, install with pip::
 Documentation
 -------------
 
-The full documentation is published on `Read the Docs <https://pass.readthedocs.io/>`_.
+The Sphinx sources live in ``doc/`` and can be built locally::
+
+    uv sync --group docs
+    uv run sphinx-build -b html doc doc/_build/html
+
 A landing page with a quick overview is available on
 `GitHub Pages <https://rimvaliulin.github.io/pass/>`_.
 
