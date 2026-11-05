@@ -1,10 +1,12 @@
-# encoding: utf-8
+"""Command-line interface for the Pass compiler."""
+
 import argparse
 
 from Pass import get_version
 
 
 def main():
+    """Parse command-line arguments and compile the given ``.pass`` file."""
     parser = argparse.ArgumentParser(prog='pass', usage='%(prog)s [options] filename',
                                      description='Compiles .pass files to .css')
 

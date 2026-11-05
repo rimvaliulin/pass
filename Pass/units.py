@@ -1,5 +1,9 @@
-# encoding: utf-8
-from __future__ import unicode_literals, division
+"""CSS length units with conversion and arithmetic.
+
+``unit_pattern`` rewrites ``12px``-style values in an expression into
+unit constructor calls (``Px(12)``) so expressions can be evaluated
+with :func:`eval` while keeping the units.
+"""
 
 import re
 import functools
@@ -17,18 +21,27 @@ def unit_replace(match):
 
 
 def unit_pattern(string):
+    """Replace ``<number><unit>`` occurrences with unit constructor calls, e.g. ``1px`` -> ``Px(1)``."""
     return p.sub(unit_replace, string)
 
 
 class Unit(object):
+    """A CSS length value with a unit type.
+
+    Values of the same or convertible absolute types (mm, cm, in, pt, pc, px)
+    support arithmetic and comparison; relative types (em, ex, %) can only
+    be combined with themselves. ``str()`` renders back to CSS, e.g. ``150px``.
+    """
 
     __slots__ = ('type', 'value')
 
     def __init__(self, value):
+        """Initialize from a number or another unit of a compatible type."""
         self.type = self.__class__.__name__.replace('Pr', '%').lower()
         self.value = self.convert(value)
 
     def convert(self, value):
+        """Return ``value`` as a plain number in this unit's terms, validating type and range."""
         try:
             if self.type == value.type:
                 return value.value
@@ -64,6 +77,7 @@ class Unit(object):
             return value
 
     def percent(self, other, operator):
+        """Apply ``operator`` for reflected percent operations, e.g. ``100 - Pr(20)``."""
         if self.type != "%":
             raise ValueError("left operand must be unit type")
         return operator(other, other*self.value)
@@ -144,7 +158,7 @@ class Unit(object):
         return value + self.type
 
     def __repr__(self):
-        return "'" + self.type + '(' + self.value + ')' + "'"
+        return "'%s(%s)'" % (self.type, self.value)
 
 
 class Em(Unit):
@@ -184,6 +198,7 @@ class Px(Unit):
 
 
 def unitdispatcher(func):
+    """Dispatch math functions (round, ceil, floor) to the wrapped unit value when given one."""
     @functools.wraps(func)
     def wrapper(*args):
         try:

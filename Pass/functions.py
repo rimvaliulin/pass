@@ -1,5 +1,10 @@
-# encoding: utf-8
-from __future__ import unicode_literals, division
+"""Built-in functions available in ``.pass`` expressions.
+
+Color helpers (rgb, hsl, lighten, darken, mix, ...), string helpers
+(quote, unquote) and number helpers (percentage, round, ceil, floor).
+All of them are registered in ``Pass.base._reserved`` and can be used
+directly in property values.
+"""
 
 import math
 

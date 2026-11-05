@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 import unittest
 from Pass.units import Em, Mm, Cm, In, Pt, Pc, Px, unit_pattern
 

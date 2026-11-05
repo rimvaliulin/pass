@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 import unittest
 from Pass.colors import Color
 from Pass.units import Pr

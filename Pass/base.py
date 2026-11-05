@@ -1,5 +1,18 @@
-# encoding: utf-8
-from __future__ import unicode_literals, with_statement
+"""The Pass compiler pipeline.
+
+Each stage is a generator that consumes and yields tuples describing
+source lines or parsed statements. ``process_pass`` wires the stages
+together::
+
+    read_from_file -> import_pass_file -> first_line_update_by_parent
+    -> ignore_empty_lines -> ignore_line_comments -> ignore_block_comments
+    -> define_variables -> tokenize_selectors_and_properties
+    -> check_indentation_errors -> check_imports_syntax -> import_files
+    -> check_media_queries_syntax -> evaluate_properties
+    -> combine_selectors -> make_statements_list -> split_selectors
+    -> inherit_statements -> handle_medias -> add_vendor_prefixes_to_properties
+    -> add_clearfix -> make_css_from_statements -> write_to_file
+"""
 
 import os
 import re
@@ -30,6 +43,7 @@ _locals = deepcopy(_reserved)
 
 @consumer
 def null():
+    """Discard everything sent to it; used as a sink at the end of the pipeline."""
     yield
     while True:
         data = yield
@@ -39,17 +53,20 @@ def null():
 
 
 def read_from_file(filename):
+    """Yield ``(filename, line number, line)`` tuples read from a UTF-8 file."""
     with open(filename, encoding='utf-8') as f:
         for n, line in enumerate(f, start=1):
             yield f.name, n, line.rstrip()
 
 
 def read_from_string(string):
+    """Yield ``(None, line number, line)`` tuples split from a string."""
     for n, line in enumerate(string.splitlines(), start=1):
         yield None, n, line.rstrip()
 
 
 def write_to_file(lines, filename, newlines=True, compressed=True):
+    """Consume ``lines`` and write them to ``filename`` with a ``.css`` extension."""
     filename, ext = os.path.splitext(filename)
     end_of_line = ('\n' if newlines else '' if compressed else '\n')
     with open(filename + '.css', 'w', encoding='utf-8', newline='') as f:
@@ -58,12 +75,14 @@ def write_to_file(lines, filename, newlines=True, compressed=True):
 
 
 def write_to_stdout(lines):
+    """Consume ``lines`` and write them to stdout."""
     for line in lines:
         sys.stdout.write(line)
 
 
 @consumer
 def import_pass_file(lines):
+    """Insert imported files into the stream when a line with a new filename is sent in."""
     yield
     try:
         while True:
@@ -78,6 +97,7 @@ def import_pass_file(lines):
 
 
 def first_line_update_by_parent(lines, target, *args, **kwargs):
+    """Handle the ``@parent`` directive: recompile the parent file and drop the stale output."""
     first = True
     for f, n, line in lines:
         if line[:7] == '@parent':
@@ -107,6 +127,7 @@ def first_line_update_by_parent(lines, target, *args, **kwargs):
 
 
 def ignore_empty_lines(lines, target):
+    """Yield only non-empty lines; empty lines are sent to ``target``."""
     for f, n, line in lines:
         if line != '' and not line.isspace() or n == 0:
             yield f, n, line
@@ -115,6 +136,7 @@ def ignore_empty_lines(lines, target):
 
 
 def ignore_line_comments(lines, target):
+    """Drop ``//`` comments; commented lines are sent to ``target``."""
     for f, n, line in lines:
         if line.lstrip().startswith('//'):
             target.send((f, n, line))
@@ -123,6 +145,7 @@ def ignore_line_comments(lines, target):
 
 
 def ignore_block_comments(lines, target):
+    """Strip ``/* ... */`` block comments, keeping inline comment-free text; removed text goes to ``target``."""
     comment = False
     start = '/*'
     end = '*/'
@@ -169,6 +192,7 @@ def ignore_block_comments(lines, target):
 
 
 def define_variables(lines, target):
+    """Evaluate ``name = value`` assignments and store them in ``_locals``; consumed lines go to ``target``."""
     for f, n, line in lines:
         if '=' in line:
             variable, _, value = line.partition('=')
@@ -237,6 +261,7 @@ def tokenize_selectors_and_properties(lines, indent='  '):
 
 
 def check_indentation_errors(lines):
+    """Raise :class:`IndentationError` for inconsistent nesting between selectors and properties."""
     for f, n, name, level, behind, sel, _sel in lines:
         if n == 0 and (_sel is True or _sel == MEDIA_TOKEN):
             raise IndentationError('expected an indented property 0', (f, n, None, name))
@@ -256,6 +281,7 @@ def check_indentation_errors(lines):
 
 
 def check_imports_syntax(lines):
+    """Raise an error for malformed or wrongly indented ``@import`` statements."""
     selector, first = False, True
     for f, n, name, level, behind, sel, _sel in lines:
         if sel == IMPORT_TOKEN:
@@ -275,6 +301,7 @@ def check_imports_syntax(lines):
 
 
 def import_files(lines, target):
+    """Expand ``@import`` statements: ``.pass`` files are re-read via ``target``, ``.css`` files are inlined."""
     sel_, behind_ = None, None
     for f, n, name, level, behind, sel, _sel in lines:
         if sel == IMPORT_TOKEN:
@@ -312,6 +339,7 @@ def import_files(lines, target):
 
 
 def check_media_queries_syntax(lines):
+    """Raise :class:`IndentationError` for malformed ``@media`` blocks."""
     media, block = False, False
     for f, n, name, level, behind, sel, _sel in lines:
         if sel == MEDIA_TOKEN:
@@ -332,6 +360,7 @@ def check_media_queries_syntax(lines):
 
 
 def filter_properties(lines):
+    """Drop duplicate property declarations, keeping the last value of each property."""
     unique, properties = [], []
     for f, n, name, level, behind, sel, _sel in lines:
         if not sel and name != 'pass':
@@ -358,6 +387,8 @@ def filter_properties(lines):
 
 
 def evaluate_properties(lines):
+    """Evaluate property expressions: substitute variables, units and colors with computed values.
+    """
     props = 'width', 'height', 'top', 'left', 'color', 'background-color', 'line-height', 'max-width', 'min-width', 'border-top-color'
     for f, n, name, level, behind, sel, _sel in lines:
         if not sel and name != 'pass':
@@ -387,6 +418,7 @@ def evaluate_properties(lines):
 
 
 def combine_selectors(lines):
+    """Expand nested selectors into full selector paths, flattening the indentation tree."""
     first = True
     stack = []
     selectors = [[]]
@@ -413,6 +445,7 @@ def combine_selectors(lines):
 
 
 def make_statements_list(lines):
+    """Group flattened selectors with their declarations into ``(selectors, declarations)`` statements."""
     selectors, declarations = [], []
     for name, sel, _sel in last(lines, (None, True, False)):
         if sel:
@@ -425,6 +458,7 @@ def make_statements_list(lines):
 
 
 def split_selectors(lines):
+    """Split compound selectors into chunks so descendants read naturally (``.menu -item``)."""
     for selectors, declarations in lines:
         _selectors = []
         for selector in selectors:
@@ -442,11 +476,13 @@ def split_selectors(lines):
 
 
 def inherit_statements(lines, respect_indents=True, inherit_selectors=False):
-    """
-    # Class naming scheme:
-    > block - element
-    > child_block _ parent_block - parent_element _ child_element
-    It differs from BEM (Block - Element - Modificator), developed by Yandex.
+    """Inherit declarations from parent selectors following the class naming scheme::
+
+        block-element
+        child_block-parent_block-parent_element-child_element
+
+    Unlike BEM (Block - Element - Modificator) by Yandex, ``_`` marks a child
+    of the previous part and ``-`` separates block from element.
     """
     index = {}
     statements = []
@@ -505,6 +541,7 @@ def inherit_statements(lines, respect_indents=True, inherit_selectors=False):
 
 
 def handle_medias(lines):
+    """Collect ``@media`` conditions per statement and strip them from the selector names."""
     for selectors, declarations in lines:
         media, _selectors = [], []
         for selector in selectors:
@@ -521,6 +558,7 @@ def handle_medias(lines):
 
 
 def add_vendor_prefixes_to_properties(lines):
+    """Add ``-webkit-``/``-moz-``/``-ms-``/``-o-`` prefixed copies of properties that need them."""
     for media, selectors, declarations in lines:
         declaration_list = []
         for prop, expression in declarations:
@@ -532,6 +570,7 @@ def add_vendor_prefixes_to_properties(lines):
 
 
 def add_clearfix(lines, ie6_7=True):
+    """Expand the ``clearfix`` keyword into the classic ``:before``/``:after`` clearing rules."""
     for media, selectors, declarations in lines:
         declaration_list = []
         _selectors = []
@@ -549,6 +588,7 @@ def add_clearfix(lines, ie6_7=True):
 
 
 def make_css_from_statements(lines, compressed=True, empty_selectors=True, indent='    ', target=None):
+    """Render statements as CSS text, minified or pretty formatted, grouped by ``@media``."""
     if compressed:
         indent = ''
         try:
@@ -590,6 +630,7 @@ def make_css_from_statements(lines, compressed=True, empty_selectors=True, inden
 
 def process_pass(filename, compressed=True, empty_selectors=True, respect_indents=False,
                  inherit_selectors=False, indent='  ', css_indent='    ', newlines=True):
+    """Run the full compilation pipeline for ``filename`` and write the ``.css`` result."""
     target = null()
     reader = read_from_file(filename)
     importer = import_pass_file(reader)

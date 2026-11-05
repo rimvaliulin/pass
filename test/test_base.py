@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import os
 import unittest
 from Pass.base import (process_pass, read_from_string, ignore_empty_lines,

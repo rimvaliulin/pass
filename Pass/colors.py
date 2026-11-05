@@ -1,11 +1,15 @@
-# encoding: utf-8
-from __future__ import unicode_literals, division
+"""CSS color model: RGB/HSL conversion, descriptors and the ``Color`` class."""
 
 import re
 from .units import Pr
 
 
 class ColorComponent(object):
+    """A single color channel value bounded by ``max_value``.
+
+    Supports arithmetic (the result is clamped back into a component)
+    and comparison against other components or plain numbers.
+    """
 
     __slots__ = ('max_value', '_value')
 
@@ -76,6 +80,7 @@ class ColorComponent(object):
 
 
 class InitColorDescriptors(type):
+    """Metaclass that names the ``_r``/``_h``-style storage slots of each descriptor."""
 
     def __new__(mcs, name, bases, attrs):
         for attr, instance in attrs.items():
@@ -85,6 +90,11 @@ class InitColorDescriptors(type):
 
 
 class ColorDescriptor(object):
+    """Descriptor that stores a color channel as a :class:`ColorComponent` on the instance.
+
+    ``name`` (the private storage slot, e.g. ``_r``) is assigned by
+    the :class:`InitColorDescriptors` metaclass.
+    """
 
     __slots__ = ('name', 'max_value')
 
@@ -106,6 +116,7 @@ class ColorDescriptor(object):
 
 
 class RgbDescriptor(ColorDescriptor):
+    """Descriptor for an RGB channel; converts HSL to RGB on read when HSL was changed last."""
 
     def __get__(self, instance, owner):
         if getattr(instance, 'hsl_changed', False):
@@ -118,6 +129,7 @@ class RgbDescriptor(ColorDescriptor):
 
 
 class HslDescriptor(ColorDescriptor):
+    """Descriptor for an HSL channel; converts RGB to HSL on read when RGB was changed last."""
 
     def __get__(self, instance, owner):
         if getattr(instance, 'rgb_changed', False):
@@ -130,6 +142,13 @@ class HslDescriptor(ColorDescriptor):
 
 
 class Color(object, metaclass=InitColorDescriptors):
+    """A color with lazily synchronized RGB and HSL representations.
+
+    Created from a hex string (``Color('ff9c00')``), another color,
+    or up to four channel values (``Color(255, 156, 0)``).
+    Channels are exposed as ``r``, ``g``, ``b`` (0..255) and
+    ``h`` (0..360), ``s``, ``l`` (0..1) descriptors.
+    """
 
     r, g, b = RgbDescriptor(255), RgbDescriptor(255), RgbDescriptor(255)
     h, s, l = HslDescriptor(360), HslDescriptor(1), HslDescriptor(1)
@@ -138,6 +157,7 @@ class Color(object, metaclass=InitColorDescriptors):
                  '_h', '_s', '_l', 'hsl_changed', 'a')
 
     def __init__(self, *args):
+        """Initialize from a hex string, another color, or RGB(A) channel values."""
         if len(args) == 1:
             try:
                 self.from_hex(*args)
@@ -149,11 +169,13 @@ class Color(object, metaclass=InitColorDescriptors):
             raise TypeError
 
     def from_color(self, color):
+        """Copy the RGB channels (and alpha, if present) from another color."""
         self.r, self.g, self.b = color.r, color.g, color.b
         if getattr(color, 'a', False):
             self.a = color.a
 
     def from_hex(self, hex_string):
+        """Initialize the RGB channels from a 3- or 6-digit hex string like ``'f00'``."""
         v = int('0x' + hex_string, 16)
         if len(hex_string) == 3:
             r, g, b = v >> 8, (v >> 4) - (v >> 8 << 4), v - (v >> 4 << 4)
@@ -162,18 +184,21 @@ class Color(object, metaclass=InitColorDescriptors):
             self.r, self.g, self.b = v >> 16, (v >> 8) - (v >> 16 << 8), v - (v >> 8 << 8)
 
     def from_rgb(self, r, g, b, a=None):
+        """Initialize from RGB channels (0..255 or :class:`Pr` percentages) and optional alpha."""
         self.r, self.g, self.b = r, g, b
         self.hsl_changed = False
         if a is not None:
             self.a = a
 
     def from_hsl(self, h, s, l, a=None):
+        """Initialize from HSL channels (h 0..360, s/l 0..1 or :class:`Pr` percentages) and optional alpha."""
         self.h, self.s, self.l = h, s, l
         self.rgb_changed = False
         if a is not None:
             self.a = a
 
     def rgb_to_hsl(self):
+        """Recompute the HSL channels from the current RGB values."""
         r, g, b = self._r.value, self._g.value, self._b.value
         _max = max(r, g, b)
         _min = min(r, g, b)
@@ -198,6 +223,7 @@ class Color(object, metaclass=InitColorDescriptors):
             self._h.value, self._s.value, self._l.value = h, s, l
 
     def hsl_to_rgb(self):
+        """Recompute the RGB channels from the current HSL values."""
         h, s, l = self._h.value, self._s.value, self._l.value
         m2 = l*(s + 1) if l <= 0.5 else l + s - l*s
         m1 = l*2 - m2
@@ -212,6 +238,7 @@ class Color(object, metaclass=InitColorDescriptors):
             self._r.value, self._g.value, self._b.value = r, g, b
 
     def hue_to_rgb(self, m1, m2, h):
+        """Convert a single hue sector into an RGB channel value."""
         if h < 0:
             h += 1
         elif h > 1:
@@ -230,12 +257,14 @@ class Color(object, metaclass=InitColorDescriptors):
         return self.to_hex()
 
     def to_hex(self):
+        """Return the color as a hex string, shortened to 3 digits when possible."""
         r, g, b = int(self.r), int(self.g), int(self.b)
         if all(map(lambda x: (x >> 4) == (x - (x >> 4 << 4)), (r, g, b))):
             return '#%x%x%x' % (r >> 4, g >> 4, b >> 4)
         return '#%02x%02x%02x' % (r, g, b)
 
     def to_rgb(self):
+        """Return the color as an ``rgb()`` or ``rgba()`` CSS function string."""
         r, g, b = self.r, self.g, self.b
         try:
             return 'rgba(%s, %s, %s, %s)' % (r, g, b, self.a)
@@ -243,6 +272,7 @@ class Color(object, metaclass=InitColorDescriptors):
             return 'rgb(%s, %s, %s)' % (r, g, b)
 
     def to_hsl(self):
+        """Return the color as an ``hsl()`` or ``hsla()`` CSS function string."""
         h, s, l = self.h, self.s, self.l
         try:
             return 'hsla(%s, %s, %s, %s)' % (h, s, l, self.a)
@@ -254,6 +284,7 @@ p = re.compile(r'#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})')
 
 
 def color_pattern(string):
+    """Replace ``#abc``/``#aabbcc`` hex colors with ``Color("...")`` constructor calls."""
     return p.sub('Color("\\1")', string)
 
 if __name__ == '__main__':

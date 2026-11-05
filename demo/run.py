@@ -1,3 +1,5 @@
+"""Playground for the ``consumer`` coroutine pattern used by the Pass pipeline."""
+
 from io import StringIO
 from token import NUMBER, NAME, OP, STRING
 from tokenize import generate_tokens, untokenize

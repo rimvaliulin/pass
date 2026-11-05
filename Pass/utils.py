@@ -1,9 +1,11 @@
-# encoding: utf-8
+"""Small helpers shared by the compiler: selector grammar, generator utilities."""
+
 import functools
 import re
 
 
 def selector_pattern():
+    """Compile and return the CSS selector grammar regex (W3C CSS2.1 grammar subset)."""
     nmstart = r'[_a-z]'
     nmchar = r'[_a-z0-9-]'
     name = nmchar + '+'
@@ -25,6 +27,7 @@ def selector_pattern():
 
 
 def last(iterable, last):
+    """Yield all elements of ``iterable`` followed by the ``last`` sentinel value."""
     empty = True
     for element in iterable:
         yield element
@@ -34,6 +37,7 @@ def last(iterable, last):
 
 
 def is_property(line):
+    """Return True if ``line`` looks like a ``property expression`` declaration."""
     if ' ' in line:
         property, _, expression = line.partition(' ')
         expression = expression.rstrip()
@@ -48,10 +52,12 @@ property_pattern = re.compile(r'^-?[_a-z][_a-z0-9-]*\s')
 
 
 def is_property_(line):
+    """Return a match object if ``line`` starts with a CSS property name, else None."""
     return property_pattern.match(line)
 
 
 def consumer(func):
+    """Decorator that primes a generator so it can be used as a push-style consumer (``send``)."""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         gen = func(*args, **kwargs)
@@ -61,6 +67,7 @@ def consumer(func):
 
 
 def memory_gen(gen):
+    """Yield ``(previous, current)`` pairs of the wrapped generator."""
     @functools.wraps(gen)
     def wrapper(*args, **kwargs):
         j = None
@@ -72,6 +79,7 @@ def memory_gen(gen):
 
 # see http://peter.sh/experiments/vendor-prefixed-css-property-overview/
 # update on that page occurred on 2013-07-20.
+# Maps a property to the vendor prefixes it needs (space-separated).
 vendor_prefixed_properties = {
     'accesskey': 'wap',
     'align-content': 'webkit',
