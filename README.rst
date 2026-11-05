@@ -32,13 +32,10 @@ Alternatively, install with pip::
 Documentation
 -------------
 
-The Sphinx sources live in ``doc/`` and can be built locally::
-
-    uv sync --group docs
-    uv run sphinx-build -b html doc doc/_build/html
-
-A landing page with a quick overview is available on
-`GitHub Pages <https://rimvaliulin.github.io/pass/>`_.
+The full documentation is published on
+`GitHub Pages <https://rimvaliulin.github.io/pass/docs/>`_ (Sphinx sources
+live in ``doc/``). A landing page with a quick overview is available at
+`rimvaliulin.github.io/pass <https://rimvaliulin.github.io/pass/>`_.
 
 Command-line usage
 ------------------
