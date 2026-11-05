@@ -1,0 +1,21 @@
+// media queries and clearfix
+
+.grid
+  clearfix
+  display flex
+
+.column
+  float left
+  width 50%
+
+@media screen
+  .column
+    width 100%
+
+@media print
+  .column
+    width auto
+    border none
+
+  .grid
+    display block

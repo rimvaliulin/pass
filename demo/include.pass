@@ -1,0 +1,7 @@
+// shared definitions, imported by imports.pass
+
+brand = #1f6ba2
+
+.header
+  background-color brand
+  color #fff

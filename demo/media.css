@@ -1,0 +1,12 @@
+.grid{display:flex;}
+.grid:before{content:" ";display:table;}
+.grid:after{content:" ";display:table;clear:both;}
+.grid{*zoom:1;}
+.column{float:left;width:50%;}
+@media screen{
+.column{width:100%;}
+}
+@media print{
+.column{width:auto;border:none;}
+.grid{display:block;}
+}

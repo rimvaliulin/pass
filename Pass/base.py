@@ -23,7 +23,10 @@ from copy import deepcopy
 from .utils import last, consumer, vendor_prefixed_properties
 from .units import Em, Pr, Pt, Cm, Mm, Px, Pc, Ex, In, unit_pattern
 from .colors import color_pattern, Color
-from .functions import round_, lighten, darken, desaturate, saturate
+from .functions import (round_, lighten, darken, desaturate, saturate, rgb, rgba, hsl, hsla,
+                        red, green, blue, hue, saturation, lightness, alpha, spinin, spinout,
+                        fadein, fadeout, grayscale, complement, invert, mix, quote, unquote,
+                        percentage, ceil, floor)
 
 IMPORT_TOKEN = 2
 MEDIA_TOKEN = 3
@@ -35,6 +38,12 @@ _reserved = {
     'transparent': 'transparent',
     'abs': abs, 'min': min, 'max': max, 'map': map, 'any': any, 'all': all, 'float': float, 'int': int,
     'round': round_, 'lighten': lighten, 'darken': darken, 'saturate': saturate, 'desaturate': desaturate,
+    'rgb': rgb, 'rgba': rgba, 'hsl': hsl, 'hsla': hsla,
+    'red': red, 'green': green, 'blue': blue, 'hue': hue, 'saturation': saturation,
+    'lightness': lightness, 'alpha': alpha, 'spinin': spinin, 'spinout': spinout,
+    'fadein': fadein, 'fadeout': fadeout, 'grayscale': grayscale, 'complement': complement,
+    'invert': invert, 'mix': mix, 'quote': quote, 'unquote': unquote,
+    'percentage': percentage, 'ceil': ceil, 'floor': floor,
     'Em': Em, 'Pr': Pr, 'Pt': Pt, 'Cm': Cm, 'Mm': Mm, 'Px': Px, 'Pc': Pc, 'Ex': Ex, 'In': In,
     'Color': Color,
 }

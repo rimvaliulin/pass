@@ -1,0 +1,22 @@
+// variables, units and color functions
+
+brand = #1f6ba2
+gap = 16px
+radius = 4px
+
+.button
+  color brand
+  background-color lighten(brand, 45%)
+  border-radius radius
+  padding gap / 2
+  margin 0 auto
+  transition all .2s
+
+.button:hover
+  background-color darken(brand, 10%)
+  border-radius radius + 2px
+
+.label
+  color mix(brand, #ffffff, Pr(30))
+  padding-left 1em + 0.25
+  line-height 1.5

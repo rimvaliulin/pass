@@ -1,0 +1,7 @@
+// @import of other .pass and .css files
+
+@import "include.pass" "include.css"
+
+.page
+  color brand
+  width 100%

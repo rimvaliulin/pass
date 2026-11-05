@@ -186,7 +186,7 @@ def mix(color, color1, weight=Pr(50)):
 
     p = weight.value/100.0
     w = p * 2 - 1
-    a = color.a - color1.a
+    a = getattr(color, 'a', 1) - getattr(color1, 'a', 1)
 
     w1 = ((w if w * a == -1 else (w + a) / (1 + w * a)) + 1) / 2.0
     w2 = 1 - w1
@@ -195,7 +195,7 @@ def mix(color, color1, weight=Pr(50)):
     g = color.g * w1 + color1.g * w2
     b = color.b * w1 + color1.b * w2
 
-    a = color.a * p + color1.a * (1 - p)
+    a = getattr(color, 'a', 1) * p + getattr(color1, 'a', 1) * (1 - p)
 
     return Color(r, g, b, a)
 
