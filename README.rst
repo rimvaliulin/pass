@@ -19,13 +19,22 @@ install the package in editable mode run::
 
     uv sync
 
-After that use ``uv run`` to invoke commands inside the managed environment::
+To install the ``pass`` command globally as an isolated tool run::
 
-    uv run pass style.pass
+    uv tool install pass
+
+(or ``uv tool install .`` from a checkout of this repository).
 
 Alternatively, install with pip::
 
     pip install pass
+
+Documentation
+-------------
+
+The full documentation is published on `Read the Docs <https://pass.readthedocs.io/>`_.
+A landing page with a quick overview is available on
+`GitHub Pages <https://rimvaliulin.github.io/pass/>`_.
 
 Command-line usage
 ------------------
@@ -53,53 +62,76 @@ Variables and operators
 Variables allow you to specify widely used values in a single place, and then re-use them throughout the stylesheet,
 making global changes as easy as changing one line of code.
 
-+------------------------------------------+------------------------------------------+
-|::                                        |::                                        |
-|                                          |                                          |
-|    // Pass                               |    /* Compiled CSS */                    |
-|    link_active = #1f6ba2                 |    .menu-item {                          |
-|    link_hover = #ccc                     |        color: #1f6ba2;                   |
-|    link_height = 32px                    |        line-height: 16px                 |
-|    link_size = 1em                       |    }                                     |
-|                                          |    a:hover {                             |
-|    .menu-item                            |        color: #ccc                       |
-|      color link_active                   |        font-size: 1.5em                  |
-|      line-height link_height / 2         |        background: #000                  |
-|                                          |    }                                     |
-|    a:hover                               |                                          |
-|      color link_hover                    |                                          |
-|      font-size link_size + 0.5           |                                          |
-|      background #000                     |                                          |
-|                                          |                                          |
-+------------------------------------------+------------------------------------------+
+.. code-block:: scss
+
+    // Pass
+    link_active = #1f6ba2
+    link_hover = #ccc
+    link_height = 32px
+    link_size = 1em
+
+    .menu-item
+      color link_active
+      line-height link_height / 2
+
+    a:hover
+      color link_hover
+      font-size link_size + 0.5
+      background #000
+
+.. code-block:: css
+
+    /* Compiled CSS */
+    .menu-item {
+        color: #1f6ba2;
+        line-height: 16px
+    }
+    a:hover {
+        color: #ccc;
+        font-size: 1.5em;
+        background: #000
+    }
 
 Nested selectors
 ----------------
 Rather than constructing long selector names to specify inheritance, you can simply nest selectors
 inside other selectors.
 
-+------------------------------------------+------------------------------------------+
-|::                                        |::                                        |
-|                                          |                                          |
-|    // Pass                               |    /* Compiled CSS */                    |
-|    line_height = 16px                    |    .menu {                               |
-|    .menu                                 |        margin-bottom 8px                 |
-|      margin-bottom line_height/2         |    }                                     |
-|      -item                               |    .menu-item {                          |
-|        float left                        |        float left                        |
-|        color #fff                        |        color #fff                        |
-|        :visited                          |    }                                     |
-|          color #eee                      |    .menu-item:visited {                  |
-|        _active                           |        color #eee                        |
-|        :hover                            |    }                                     |
-|          color #ccc                      |    .menu-item_active, .menu-item:hover { |
-|      span                                |       color #ccc                         |
-|        background-color #ccc             |    }                                     |
-|                                          |    .menu span {                          |
-|                                          |        background-color #ccc             |
-|                                          |    }                                     |
-|                                          |                                          |
-+------------------------------------------+------------------------------------------+
+.. code-block:: scss
+
+    // Pass
+    line_height = 16px
+    .menu
+      margin-bottom line_height/2
+      -item
+        float left
+        color #fff
+        :visited
+          color #eee
+        _active
+          color #ccc
+      span
+        background-color #ccc
+
+.. code-block:: css
+
+    /* Compiled CSS */
+    .menu {
+        margin-bottom: 8px
+    }
+    .menu-item {
+        float: left;
+        color: #fff
+    }
+    .menu-item:visited {
+        color: #eee
+    }
+    .menu-item_active, .menu-item:hover {
+        color: #ccc
+    }
+    .menu span {
+        background-color: #ccc
+    }
 
 Selector inheritance
 --------------------
@@ -108,28 +140,37 @@ Class naming scheme::
              block-[element]
     [child_]parent-[[parent]_child]
 
-+------------------------------------------+------------------------------------------+
-|::                                        |::                                        |
-|                                          |                                          |
-|    // Pass                               |    /* Compiled CSS */                    |
-|    ._foo                                 |    ._foo,.foo,.сhild_foo,.new_child_foo{}|
-|      pass                                |    .foo{}                                |
-|                                          |    .child_foo,.new_child_foo{}           |
-|    .foo                                  |    .new_child_foo{}                      |
-|      pass                                |                                          |
-|                                          |                                          |
-|    .сhild_foo                            |                                          |
-|      pass                                |                                          |
-|                                          |                                          |
-|    .new_child_foo                        |                                          |
-|      pass                                |    .bar-link,bar-link_active{}           |
-|                                          |    bar-link_active{}                     |
-|    .bar                                  |                                          |
-|      -link                               |                                          |
-|        pass                              |                                          |
-|        _acive                            |                                          |
-|          pass                            |                                          |
-+------------------------------------------+------------------------------------------+
+.. code-block:: scss
+
+    // Pass
+    ._foo
+      pass
+
+    .foo
+      pass
+
+    .child_foo
+      pass
+
+    .new_child_foo
+      pass
+
+    .bar
+      -link
+        pass
+        _acive
+          pass
+
+.. code-block:: css
+
+    /* Compiled CSS */
+    ._foo,.foo,.child_foo,.new_child_foo{}
+    .foo{}
+    .child_foo,.new_child_foo{}
+    .new_child_foo{}
+
+    .bar-link,bar-link_active{}
+    bar-link_active{}
 
 
 Parent directive
